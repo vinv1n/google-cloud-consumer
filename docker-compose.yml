@@ -8,13 +8,17 @@ services:
             - 8080:8081
         networks:
             - api-network
+        volumes:
+            - ./api-credentials/credentials.json:/tmp/credentials.json
+        environment:
+            - GOOGLE_APPLICATION_CREDENTIALS=/tmp/credentials.json
 
     nginx:
         image: nginx:1.17.6
         volumes:
-         - ./config/nginx.conf:/etc/nginx/conf.d/nginx.conf
+            - ./config/nginx.conf:/etc/nginx/conf.d/nginx.conf
         ports:
-         - "80:80"
+            - "80:80"
         links:
             - api
         networks:

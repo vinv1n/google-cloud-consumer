@@ -3,37 +3,33 @@ package main
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"log"
+	"io/ioutil"
 	"net/http"
 
 	speech "cloud.google.com/go/speech/apiv1"
 	speechpb "google.golang.org/genproto/googleapis/cloud/speech/v1"
 )
 
-type File struct {
-	audio   byte
-	content string
-	path    string
-}
-
 func main() {
 	http.HandleFunc("/api", handleResponse)
 	http.HandleFunc("/", landingPage)
 
-	http.ListenAndServe("0.0.0.0:8081", nil)
+	// logging is always a plus
+	// TODO add TLS handling
+	fmt.Println(http.ListenAndServe(":8081", nil))
 }
 
 func landingPage(writer http.ResponseWriter, request *http.Request) {
-	fmt.Fprintf(writer, "Running in ports 8081 :)")
+	fmt.Fprintf(writer, "Server running :)")
 }
 
-func createGoogleCloudRequest(file File, channel chan bool) {
+func createGoogleCloudRequest(audio []byte, channel chan bool) {
 	/*
 		A value of file should be used as long as possible as it is more efficient
 		in golang that passing a pointer
 	*/
-	err, response := makeRequest(&file)
+	err, response := makeRequest(audio)
 	if err != nil {
 		log.Fatal("Error during request to google api", err)
 		channel <- false
@@ -49,21 +45,18 @@ func createGoogleCloudRequest(file File, channel chan bool) {
 	close(channel)
 }
 
-func parsePostRequest(resp *http.Request) File {
-	// FIXME
-	file := new(File)
-	return *file
-}
-
 func handleResponse(writer http.ResponseWriter, request *http.Request) {
 
 	switch request.Method {
 	case "POST":
-		file := parsePostRequest(request)
+		audio, err := ioutil.ReadAll(request.Body)
+		if err != nil {
+			fmt.Fprintf(writer, "Error during reading request content. Error %v", err)
+		}
 		channel := make(chan bool, 1)
 
 		// creates a new go runtime routine
-		go createGoogleCloudRequest(file, channel)
+		go createGoogleCloudRequest(audio, channel)
 
 		// waits untill response is sent to the channel
 		defer func() {
@@ -80,7 +73,7 @@ func handleResponse(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
-func makeRequest(file *File) ([]string, error) {
+func makeRequest(audio []byte) ([]string, error) {
 	/*
 		Based on example provided on official google cloud docmentation
 		TODO add some better handling for errors
@@ -93,12 +86,6 @@ func makeRequest(file *File) ([]string, error) {
 	client, err := speech.NewClient(context)
 	if err != nil {
 		log.Fatalf("Could not create client for google cloud, error %v", err)
-		return nil, err
-	}
-
-	audio, err := ioutil.ReadFile(file.path)
-	if err != nil {
-		log.Fatalf("Could not read file %v", err)
 		return nil, err
 	}
 
