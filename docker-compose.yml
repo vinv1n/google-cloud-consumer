@@ -1,0 +1,25 @@
+version: "3.3"
+services:
+    api:
+        build:
+            dockerfile: docker/Dockerfile
+            context: .
+        ports:
+            - 8080:8081
+        networks:
+            - api-network
+
+    nginx:
+        image: nginx:1.17.6
+        volumes:
+         - ./config/nginx.conf:/etc/nginx/conf.d/nginx.conf
+        ports:
+         - "80:80"
+        links:
+            - api
+        networks:
+            - api-network
+
+networks:
+    api-network:
+        driver: bridge
