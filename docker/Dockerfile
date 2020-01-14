@@ -10,7 +10,9 @@ WORKDIR /go/src/github.com/builder/cloud-consumer
 
 RUN GO111MODULE=on CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /go/bin/consumer
 
-FROM scratch
+FROM alpine:3.11.2
+
+RUN apk add --no-cache ca-certificates openssl
 
 COPY --from=builder /go/bin/consumer /go/bin/consumer
 
