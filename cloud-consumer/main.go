@@ -35,6 +35,7 @@ func createGoogleCloudRequest(audio []byte, channel chan []byte) {
 
 func createWebsocket(res []byte) {
 	// creates new websocket
+	log.Fatal(string(res))
 	conn, _, err := websocket.DefaultDialer.Dial("ws://0.0.0.0:8888", nil)
 	if err != nil {
 		log.Panic("Error during connecting websocket", err)
@@ -103,13 +104,17 @@ func makeRequest(audio []byte) ([]byte, error) {
 }
 
 func parseResults(resp *speechpb.RecognizeResponse) []byte {
-	// get the alternative that have hights confidence
-	// FIXME horribly broken
-	var s string;
+	// get the alternative that have highest confidence
+
+	var confidence float32;
+	var transcript string;
 	for _, res := range resp.Results {
 		for _, alt := range res.Alternatives {
-			s = alt.Transcript
-		}
+			if confidence == 0.0 || alt.Confidence >= confidence {
+				transcript = alt.Transcript
+				confidence = alt.Confidence
+			}
+		} 
 	}
-	return []byte(s)
+	return []byte(transcript)
 }
