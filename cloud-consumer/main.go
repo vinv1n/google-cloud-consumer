@@ -26,7 +26,7 @@ func landingPage(writer http.ResponseWriter, request *http.Request) {
 func createGoogleCloudRequest(audio []byte, channel chan []byte) {
 	response, err := makeRequest(audio)
 	if err != nil {
-		log.Fatal("Error during request to google api", err)
+		log.Panic("Error during request to google api", err)
 
 	}
 	channel <- response
@@ -35,7 +35,6 @@ func createGoogleCloudRequest(audio []byte, channel chan []byte) {
 
 func createWebsocket(res []byte) {
 	// creates new websocket
-	log.Fatal(string(res))
 	conn, _, err := websocket.DefaultDialer.Dial("ws://0.0.0.0:8888", nil)
 	if err != nil {
 		log.Panic("Error during connecting websocket", err)
@@ -53,7 +52,7 @@ func createWebsocket(res []byte) {
 func handlePost(request *http.Request) {
 	audio, err := ioutil.ReadAll(request.Body)
 	if err != nil {
-		log.Panic("Error during reading request content. Error %v", err)
+		log.Panic("Error during reading request content. Error ", err)
 	}
 
 	channel := make(chan []byte, 100)
