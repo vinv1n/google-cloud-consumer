@@ -35,7 +35,7 @@ func createGoogleCloudRequest(audio []byte, channel chan []byte) {
 
 func createWebsocket(res []byte) {
 	// creates new websocket
-	conn, _, err := websocket.DefaultDialer.Dial("ws://0.0.0.0:8888", nil)
+	conn, _, err := websocket.DefaultDialer.Dial("ws://core:8765", nil)
 	if err != nil {
 		log.Panic("Error during connecting websocket", err)
 	}
@@ -113,7 +113,7 @@ func parseResults(resp *speechpb.RecognizeResponse) []byte {
 				transcript = alt.Transcript
 				confidence = alt.Confidence
 			}
-		} 
+		}
 	}
 	return []byte(transcript)
 }
