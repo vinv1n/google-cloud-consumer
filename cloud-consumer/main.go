@@ -45,14 +45,16 @@ func createWebsocket(res []byte) {
 	if err != nil {
 		log.Panic("Failed send data to the socket", err)
 	}
-	// close the socket
-	conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 }
 
 func handlePost(request *http.Request) {
 	audio, err := ioutil.ReadAll(request.Body)
 	if err != nil {
 		log.Panic("Error during reading request content. Error ", err)
+	}
+	if len(audio) == 0 {
+		log.Printf("Ignoring request with empty body")
+		return
 	}
 
 	channel := make(chan []byte, 100)
@@ -86,7 +88,7 @@ func makeRequest(audio []byte) ([]byte, error) {
 
 	response, err := client.Recognize(context, &speechpb.RecognizeRequest{
 		Config: &speechpb.RecognitionConfig{
-			Encoding:        speechpb.RecognitionConfig_LINEAR16,
+			Encoding:        speechpb.RecognitionConfig_OGG_OPUS,
 			SampleRateHertz: 16000,
 			LanguageCode:    "en-US",
 		},
@@ -94,10 +96,12 @@ func makeRequest(audio []byte) ([]byte, error) {
 			AudioSource: &speechpb.RecognitionAudio_Content{Content: audio},
 		},
 	})
+
 	if err != nil {
 		log.Fatalf("Failed to recognized audio %s", err)
 		return nil, err
 	}
+
 	results := parseResults(response)
 	return results, nil
 }
