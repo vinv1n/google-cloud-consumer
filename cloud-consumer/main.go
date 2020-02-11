@@ -80,7 +80,9 @@ func handleResponse(writer http.ResponseWriter, request *http.Request) {
 	case "POST":
 		handlePost(request)
 	case "OPTIONS":
-		fmt.Fprintf(writer, "", 200)
+		// respond to options request with voice that browsers might understand
+		writer.WriteHeader(http.StatusOK)
+		writer.Write([]byte(http.StatusText(http.Status)))
 	default:
 		http.Error(writer, "Method not supported", 403)
 	}
