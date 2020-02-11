@@ -3,12 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"io/ioutil"
+	"log"
 	"net/http"
 
-	websocket "github.com/gorilla/websocket"
 	speech "cloud.google.com/go/speech/apiv1"
+	websocket "github.com/gorilla/websocket"
 	speechpb "google.golang.org/genproto/googleapis/cloud/speech/v1"
 )
 
@@ -64,7 +64,16 @@ func handlePost(request *http.Request) {
 	defer createWebsocket(<-channel)
 }
 
+func enableCors(writer *http.ResponseWriter, req *http.Request) {
+	(*writer).Header().Set("Access-Control-Allow-Origin", "*")
+	(*writer).Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	(*writer).Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+}
+
 func handleResponse(writer http.ResponseWriter, request *http.Request) {
+	// enables cors for the api
+	enableCors(&writer, request)
+
 	switch request.Method {
 	case "POST":
 		handlePost(request)
@@ -109,8 +118,8 @@ func makeRequest(audio []byte) ([]byte, error) {
 func parseResults(resp *speechpb.RecognizeResponse) []byte {
 	// get the alternative that have highest confidence
 
-	var confidence float32;
-	var transcript string;
+	var confidence float32
+	var transcript string
 	for _, res := range resp.Results {
 		for _, alt := range res.Alternatives {
 			if confidence == 0.0 || alt.Confidence >= confidence {
