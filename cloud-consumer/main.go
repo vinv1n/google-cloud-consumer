@@ -82,7 +82,7 @@ func handleResponse(writer http.ResponseWriter, request *http.Request) {
 	case "OPTIONS":
 		// respond to options request with voice that browsers might understand
 		writer.WriteHeader(http.StatusOK)
-		writer.Write([]byte(http.StatusText(http.Status)))
+		writer.Write([]byte(http.StatusText(http.StatusOK)))
 	default:
 		http.Error(writer, "Method not supported", 403)
 	}
