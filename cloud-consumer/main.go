@@ -79,6 +79,8 @@ func handleResponse(writer http.ResponseWriter, request *http.Request) {
 	switch request.Method {
 	case "POST":
 		handlePost(request)
+	case "OPTIONS":
+		fmt.Fprintf(writer, "", 200)
 	default:
 		http.Error(writer, "Method not supported", 403)
 	}
