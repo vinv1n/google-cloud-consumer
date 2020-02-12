@@ -103,10 +103,11 @@ func makeRequest(audio []byte) ([]byte, error) {
 
 	response, err := client.Recognize(context, &speechpb.RecognizeRequest{
 		Config: &speechpb.RecognitionConfig{
-			Encoding:          speechpb.RecognitionConfig_LINEAR16,
-			SampleRateHertz:   44100,
-			AudioChannelCount: 2,
-			LanguageCode:      "en-US",
+			Encoding:                            speechpb.RecognitionConfig_LINEAR16,
+			SampleRateHertz:                     44100,
+			AudioChannelCount:                   2,
+			EnableSeparateRecognitionPerChannel: true,
+			LanguageCode:                        "en-US",
 		},
 		Audio: &speechpb.RecognitionAudio{
 			AudioSource: &speechpb.RecognitionAudio_Content{Content: audio},
