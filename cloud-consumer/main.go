@@ -136,5 +136,6 @@ func parseResults(resp *speechpb.RecognizeResponse) []byte {
 			}
 		}
 	}
+	log.Printf(transcript)
 	return []byte(transcript)
 }
