@@ -104,7 +104,7 @@ func makeRequest(audio []byte) ([]byte, error) {
 	response, err := client.Recognize(context, &speechpb.RecognizeRequest{
 		Config: &speechpb.RecognitionConfig{
 			Encoding:        speechpb.RecognitionConfig_OGG_OPUS,
-			SampleRateHertz: 16000,
+			SampleRateHertz: 44100,
 			LanguageCode:    "en-US",
 		},
 		Audio: &speechpb.RecognitionAudio{
