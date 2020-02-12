@@ -45,8 +45,6 @@ func createWebsocket(res []byte) {
 	if err != nil {
 		log.Panic("Failed send data to the socket", err)
 	}
-	conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
-	conn.Close()
 }
 
 func handlePost(request *http.Request) {
